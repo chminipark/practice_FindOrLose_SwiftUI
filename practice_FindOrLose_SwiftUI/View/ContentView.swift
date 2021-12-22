@@ -9,35 +9,42 @@ import SwiftUI
 
 struct ContentView: View {
   
-  @State var gameState: GameState = .stop
+  @StateObject var gameManager = GameManager()
   
   var body: some View {
     
     NavigationView {
       VStack(alignment: .leading, spacing: 20) {
-        Text("Score")
+        Text("\(gameManager.score)")
           .font(.title3)
         
-        VStack {
-          HStack {
-            Image(systemName: "photo")
-              .imageModifier()
-            Image(systemName: "photo")
-              .imageModifier()
-          }
-          HStack {
-            Image(systemName: "photo")
-              .imageModifier()
-            Image(systemName: "photo")
-              .imageModifier()
+        if gameManager.gameImages.isEmpty {
+          Text("No Images...")
+        } else {
+          VStack {
+            ForEach(gameManager.gameImagesLayout.indices) { row in
+              HStack {
+                ForEach(gameManager.gameImagesLayout[row].indices) { idx in
+                  Button  {
+//                    print(gameManager.gameImagesLayout[row][idx].id)
+                    gameManager.imageButtonAction(id: gameManager.gameImagesLayout[row][idx].id)
+                  } label: {
+                    Image(uiImage: gameManager.gameImagesLayout[row][idx].image)
+                      .resizable()
+                      .aspectRatio(1, contentMode: .fit)
+                  }
+                  
+                }
+              }
+            }
           }
         }
         
-        Button(gameState == .play ? "Stop" : "Play") {
-          gameState = gameState == .play ? .stop : .play
+        Button(gameManager.gameState == .play ? "Stop" : "Play") {
+          gameManager.gameState = gameManager.gameState == .play ? .stop : .play
         }
         .font(.title2)
-        .buttonStyle(StateButtonStyle(isSelected: gameState))
+        .buttonStyle(StateButtonStyle(isSelected: gameManager.gameState))
 
       }
       .padding()
